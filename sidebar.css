@@ -1,0 +1,115 @@
+/* =========================
+   SIDEBAR – DESKTOP DEFAULT
+========================= */
+.sidebar {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    width: 216px;
+    height: calc(100vh - 64px);
+    background: #F1F5F8;
+    border-right: 1px solid rgba(46, 46, 46, 0.25);
+    box-sizing: border-box;
+    z-index: 10;
+  }
+  
+  /* =========================
+     COLLAPSE BUTTON
+  ========================= */
+  .sidebar-collapse {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  
+  /* Chevron visibility */
+  .chevron-down {
+    display: none;
+  }
+  
+  /* =========================
+     MENU – DESKTOP
+  ========================= */
+  .sidebar-menu {
+    margin-top: 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-left: 20px;
+  }
+  
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 25px;
+    text-decoration: none;
+    font-family: "Open Sans", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    color: rgba(46, 46, 46, 0.5);
+  }
+  
+  .sidebar-item .icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .sidebar-item.active {
+    color: #2C7BE5;
+  }
+  
+  .sidebar-item.active .icon path {
+    fill: #2C7BE5;
+  }
+  
+  /* =================================================
+     MOBILE / TABLET – SIDEBAR BECOMES HORIZONTAL
+  ================================================== */
+  @media (max-width: 768px) {
+    .sidebar {
+      top: 64px;
+      left: 0;
+      width: 100%;
+      height: 56px;
+      border-right: none;
+      border-bottom: 1px solid rgba(46, 46, 46, 0.25);
+      display: flex;
+      align-items: center;
+    }
+  
+    /* Chevron switch */
+    .chevron-right {
+      display: none;
+    }
+  
+    .chevron-down {
+      display: block;
+    }
+  
+    .sidebar-collapse {
+      position: static;
+      margin-left: auto;
+      margin-right: 16px;
+    }
+  
+    /* Horizontal menu */
+    .sidebar-menu {
+      margin: 0;
+      padding-left: 16px;
+      flex-direction: row;
+      align-items: center;
+      gap: 24px;
+    }
+  
+    .sidebar-item {
+      height: auto;
+      font-size: 14px;
+    }
+  }
+  

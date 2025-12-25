@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CAPMINDS</title>
+
+  <!-- GLOBAL STYLES -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="calendar.css">
+  <link rel="stylesheet" href="modal.css">
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =========================
+       FIXED LAYOUT
+    ========================= */
+    .header-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .sidebar-fixed {
+      position: fixed;
+      top: 64px;
+      left: 0;
+      width: 216px;
+      height: calc(100vh - 64px);
+      z-index: 900;
+    }
+
+    .main-content-fixed {
+      margin-top: 64px;
+      margin-left: 216px;
+      padding: 24px;
+      min-height: calc(100vh - 64px);
+      background: #f4f6f8;
+      overflow-x: hidden;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      .sidebar-fixed {
+        width: 100%;
+        height: 56px;
+      }
+
+      .main-content-fixed {
+        margin-top: 120px;
+        margin-left: 0;
+        padding: 16px;
+        overflow-x: hidden;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       MODAL FUNCTIONS (DEFINE FIRST)
+  ========================= -->
+  <script>
+    /* =========================
+       MODAL FUNCTIONS (GLOBAL)
+    ========================= */
+    window.openModal = function() {
+      const modal = document.getElementById("appointmentModal");
+      if (modal) {
+        modal.classList.add("active");
+        document.body.style.overflow = "hidden";
+        console.log("Modal opened");
+      } else {
+        console.error("Modal not found!");
+      }
+    };
+
+    window.closeModal = function() {
+      const modal = document.getElementById("appointmentModal");
+      if (modal) {
+        modal.classList.remove("active");
+        document.body.style.overflow = "";
+        console.log("Modal closed");
+      }
+    };
+  </script>
+
+  <!-- =========================
+       HEADER
+  ========================= -->
+  <div id="header-root" class="header-fixed"></div>
+
+  <!-- =========================
+       SIDEBAR
+  ========================= -->
+  <div id="sidebar-root" class="sidebar-fixed"></div>
+
+  <!-- =========================
+       MAIN CONTENT
+  ========================= -->
+  <main class="main-content-fixed">
+
+    <!-- CALENDAR VIEW (DEFAULT) -->
+    <section id="calendar-view"></section>
+
+    <!-- DASHBOARD VIEW -->
+    <section id="dashboard-view" style="display:none;"></section>
+
+  </main>
+
+  <!-- =========================
+       MODAL
+  ========================= -->
+  <div id="modal-root"></div>
+
+  <!-- =========================
+       SCRIPTS
+  ========================= -->
+  <script>
+    /* =========================
+       LOAD HTML PARTIALS
+    ========================= */
+    fetch("header.html")
+      .then(r => r.text())
+      .then(html => document.getElementById("header-root").innerHTML = html);
+
+    fetch("sidebar.html")
+      .then(r => r.text())
+      .then(html => document.getElementById("sidebar-root").innerHTML = html);
+
+    fetch("calendar.html")
+      .then(r => r.text())
+      .then(html => {
+        document.getElementById("calendar-view").innerHTML = html;
+        // Initialize calendar after loading
+        if (typeof renderCalendar === 'function') {
+          renderCalendar();
+        }
+      });
+
+    fetch("dashboard.html")
+      .then(r => r.text())
+      .then(html => document.getElementById("dashboard-view").innerHTML = html);
+
+    fetch("modal.html")
+      .then(r => r.text())
+      .then(html => document.getElementById("modal-root").innerHTML = html);
+
+    /* =========================
+       SIDEBAR TAB SWITCHING
+    ========================= */
+    document.addEventListener("click", function (e) {
+      const calendarTab = e.target.closest("#calendarTab");
+      const dashboardTab = e.target.closest("#dashboardTab");
+
+      const calendarView = document.getElementById("calendar-view");
+      const dashboardView = document.getElementById("dashboard-view");
+
+      if (calendarTab) {
+        e.preventDefault();
+
+        calendarView.style.display = "block";
+        dashboardView.style.display = "none";
+
+        calendarTab.classList.add("active");
+        document.getElementById("dashboardTab").classList.remove("active");
+      }
+
+      if (dashboardTab) {
+        e.preventDefault();
+
+        dashboardView.style.display = "block";
+        calendarView.style.display = "none";
+
+        dashboardTab.classList.add("active");
+        document.getElementById("calendarTab").classList.remove("active");
+      }
+    });
+  </script>
+
+  <!-- Calendar functionality script -->
+  <script src="calendar.js"></script>
+  
+  <!-- Modal functionality script -->
+  <script src="modal.js"></script>
+
+</body>
+</html>
