@@ -1,14 +1,24 @@
 console.log("calendar.js loaded");
 
 let current = new Date();
-let selectedDate = null;
 
 /* =========================
-   CALENDAR RENDER
+   DEFAULT SELECTED DATE = TODAY
+========================= */
+let selectedDate =
+  current.getFullYear() +
+  "-" +
+  String(current.getMonth() + 1).padStart(2, "0") +
+  "-" +
+  String(current.getDate()).padStart(2, "0");
+
+/* =========================
+   RENDER CALENDAR
 ========================= */
 function renderCalendar() {
   const calendarDays = document.getElementById("calendarDays");
   const currentDateLabel = document.getElementById("currentDateLabel");
+  const dayHeaders = document.querySelectorAll(".day-name");
 
   if (!calendarDays || !currentDateLabel) return;
 
@@ -18,6 +28,14 @@ function renderCalendar() {
     month: "long",
     day: "numeric",
     year: "numeric"
+  });
+
+  /* =========================
+     HIGHLIGHT TODAY HEADER
+  ========================= */
+  const todayIndex = new Date().getDay(); // 0–6
+  dayHeaders.forEach((h, i) => {
+    h.classList.toggle("today-header", i === todayIndex);
   });
 
   const year = current.getFullYear();
@@ -45,33 +63,35 @@ function renderCalendar() {
       dayDiv.classList.add("other-month");
     }
 
+    if (dateStr === selectedDate) {
+      dayDiv.classList.add("selected");
+    }
+
     if (cellDate.toDateString() === new Date().toDateString()) {
       dayDiv.classList.add("today");
     }
 
     dayDiv.innerHTML = `
-      <div class="day-number">
-        ${cellDate.getDate() === 1
-          ? cellDate.toLocaleDateString("en-US", { month: "short" }) + " 1"
-          : cellDate.getDate()}
-      </div>
+      <div class="day-number">${cellDate.getDate()}</div>
     `;
 
-    // Click to select date
+    /* =========================
+       SELECT DAY
+    ========================= */
     dayDiv.addEventListener("click", () => {
       selectedDate = dateStr;
-      updateCalendarOwner();
+      renderCalendar();
     });
 
-    // Render ALL appointments for that day
+    /* =========================
+       APPOINTMENTS
+    ========================= */
     window.appointmentsStore
       .filter(a => a.date === dateStr)
       .forEach(a => {
         dayDiv.innerHTML += `
           <div class="appointment">
-            <div class="appointment-text">
-              ${a.patient} (${a.doctor}) ${formatTime(a.time)}
-            </div>
+            ${a.patient} (${a.doctor}) ${formatTime(a.time)}
           </div>
         `;
       });
@@ -83,30 +103,27 @@ function renderCalendar() {
 }
 
 /* =========================
-   CALENDAR OWNER (PATIENT NAMES)
+   OWNER ROW
 ========================= */
 function updateCalendarOwner() {
-  const ownerEl = document.querySelector(".calendar-owner");
-  if (!ownerEl || !selectedDate) {
-    if (ownerEl) ownerEl.style.display = "none";
-    return;
-  }
+  const owner = document.querySelector(".calendar-owner");
+  if (!owner) return;
 
   const todaysAppointments = window.appointmentsStore.filter(
     a => a.date === selectedDate
   );
 
   if (todaysAppointments.length === 0) {
-    ownerEl.style.display = "none";
+    owner.style.display = "none";
     return;
   }
 
-  const uniquePatients = [
+  const patients = [
     ...new Set(todaysAppointments.map(a => a.patient))
   ];
 
-  ownerEl.innerText = uniquePatients.join(", ");
-  ownerEl.style.display = "flex";
+  owner.innerText = patients.join(", ");
+  owner.style.display = "flex";
 }
 
 /* =========================
@@ -137,7 +154,6 @@ function goToday() {
    HELPERS
 ========================= */
 function formatTime(time24) {
-  if (!time24) return "";
   const [h, m] = time24.split(":");
   let hour = parseInt(h, 10);
   const ampm = hour >= 12 ? "pm" : "am";
@@ -146,6 +162,9 @@ function formatTime(time24) {
 }
 
 /* =========================
-   EXPOSE
+   EXPORTS
 ========================= */
 window.renderCalendar = renderCalendar;
+window.prevMonth = prevMonth;
+window.nextMonth = nextMonth;
+window.goToday = goToday;
