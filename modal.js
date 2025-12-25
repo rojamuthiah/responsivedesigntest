@@ -8,6 +8,22 @@ let editingIndex = null;
 function openModal() {
   const modal = document.getElementById("appointmentModal");
   if (!modal) return;
+
+  // 🔴 CRITICAL FIX:
+  // Reset edit state so new appointment does NOT overwrite old
+  editingIndex = null;
+
+  // Clear all fields every time modal opens
+  const selects = modal.querySelectorAll("select.field-input");
+  const dateInput = modal.querySelector("input[type='date']");
+  const timeInput = modal.querySelector("input[type='time']");
+  const reasonInput = modal.querySelector(".reason-input");
+
+  selects.forEach(s => (s.selectedIndex = 0));
+  if (dateInput) dateInput.value = "";
+  if (timeInput) timeInput.value = "";
+  if (reasonInput) reasonInput.value = "";
+
   modal.classList.add("active");
   document.body.style.overflow = "hidden";
 }
@@ -23,14 +39,12 @@ window.openModal = openModal;
 window.closeModal = closeModal;
 
 /* =========================
-   EDIT BUTTON HANDLER
+   OPEN MODAL FOR EDIT (GLOBAL)
 ========================= */
-document.addEventListener("click", e => {
-  const editBtn = e.target.closest(".edit-btn");
-  if (!editBtn) return;
+window.openEditAppointment = function (storeIndex) {
+  editingIndex = storeIndex;
 
-  editingIndex = Number(editBtn.dataset.index);
-  const appt = window.appointmentsStore[editingIndex];
+  const appt = window.appointmentsStore[storeIndex];
   const modal = document.getElementById("appointmentModal");
   if (!modal) return;
 
@@ -47,8 +61,9 @@ document.addEventListener("click", e => {
   timeInput.value = appt.time;
   reasonInput.value = appt.reason || "";
 
-  openModal();
-});
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+};
 
 /* =========================
    SAVE HANDLER
@@ -86,9 +101,11 @@ document.addEventListener("click", e => {
      SAVE TO GLOBAL STORE
   ========================= */
   if (editingIndex !== null) {
+    // EDIT
     window.appointmentsStore[editingIndex] = appointment;
     editingIndex = null;
   } else {
+    // CREATE (multiple allowed on same day)
     window.appointmentsStore.push(appointment);
   }
 
@@ -98,18 +115,12 @@ document.addEventListener("click", e => {
   if (typeof window.renderCalendar === "function") {
     window.renderCalendar();
   }
-
   if (typeof window.renderDashboard === "function") {
     window.renderDashboard();
   }
 
   /* =========================
-     CLOSE & RESET
+     CLOSE MODAL
   ========================= */
   closeModal();
-
-  selects.forEach(s => (s.selectedIndex = 0));
-  dateInput.value = "";
-  timeInput.value = "";
-  reasonInput.value = "";
 });

@@ -1,12 +1,7 @@
 console.log("calendar.js loaded");
 
 let current = new Date();
-
-/**
- * Calendar reads from the shared global store
- * store.js must be loaded before this file
- */
-const appointments = window.appointmentsStore;
+let selectedDate = null;
 
 /* =========================
    CALENDAR RENDER
@@ -36,18 +31,6 @@ function renderCalendar() {
     const cellDate = new Date(startDate);
     cellDate.setDate(startDate.getDate() + i);
 
-    const dayDiv = document.createElement("div");
-    dayDiv.className = "day";
-
-    if (cellDate.getMonth() !== month) {
-      dayDiv.classList.add("other-month");
-    }
-
-    const today = new Date();
-    if (cellDate.toDateString() === today.toDateString()) {
-      dayDiv.classList.add("today");
-    }
-
     const dateStr =
       cellDate.getFullYear() +
       "-" +
@@ -55,14 +38,33 @@ function renderCalendar() {
       "-" +
       String(cellDate.getDate()).padStart(2, "0");
 
-    const label =
-      cellDate.getDate() === 1
-        ? cellDate.toLocaleDateString("en-US", { month: "short" }) + " 1"
-        : cellDate.getDate();
+    const dayDiv = document.createElement("div");
+    dayDiv.className = "day";
 
-    dayDiv.innerHTML = `<div class="day-number">${label}</div>`;
+    if (cellDate.getMonth() !== month) {
+      dayDiv.classList.add("other-month");
+    }
 
-    appointments
+    if (cellDate.toDateString() === new Date().toDateString()) {
+      dayDiv.classList.add("today");
+    }
+
+    dayDiv.innerHTML = `
+      <div class="day-number">
+        ${cellDate.getDate() === 1
+          ? cellDate.toLocaleDateString("en-US", { month: "short" }) + " 1"
+          : cellDate.getDate()}
+      </div>
+    `;
+
+    // Click to select date
+    dayDiv.addEventListener("click", () => {
+      selectedDate = dateStr;
+      updateCalendarOwner();
+    });
+
+    // Render ALL appointments for that day
+    window.appointmentsStore
       .filter(a => a.date === dateStr)
       .forEach(a => {
         dayDiv.innerHTML += `
@@ -76,6 +78,35 @@ function renderCalendar() {
 
     calendarDays.appendChild(dayDiv);
   }
+
+  updateCalendarOwner();
+}
+
+/* =========================
+   CALENDAR OWNER (PATIENT NAMES)
+========================= */
+function updateCalendarOwner() {
+  const ownerEl = document.querySelector(".calendar-owner");
+  if (!ownerEl || !selectedDate) {
+    if (ownerEl) ownerEl.style.display = "none";
+    return;
+  }
+
+  const todaysAppointments = window.appointmentsStore.filter(
+    a => a.date === selectedDate
+  );
+
+  if (todaysAppointments.length === 0) {
+    ownerEl.style.display = "none";
+    return;
+  }
+
+  const uniquePatients = [
+    ...new Set(todaysAppointments.map(a => a.patient))
+  ];
+
+  ownerEl.innerText = uniquePatients.join(", ");
+  ownerEl.style.display = "flex";
 }
 
 /* =========================
@@ -93,17 +124,14 @@ function nextMonth() {
 
 function goToday() {
   current = new Date();
+  selectedDate =
+    current.getFullYear() +
+    "-" +
+    String(current.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(current.getDate()).padStart(2, "0");
   renderCalendar();
 }
-
-/* =========================
-   APPOINTMENT API (FROM MODAL)
-========================= */
-window.addAppointment = function ({ date }) {
-  // Jump calendar to appointment month
-  current = new Date(date);
-  renderCalendar();
-};
 
 /* =========================
    HELPERS
@@ -118,6 +146,6 @@ function formatTime(time24) {
 }
 
 /* =========================
-   INIT
+   EXPOSE
 ========================= */
 window.renderCalendar = renderCalendar;
