@@ -55,7 +55,7 @@
       margin-left: 64px;
     }
 
-    /* Mobile adjustments */
+    /* Mobile */
     @media (max-width: 768px) {
       .sidebar-fixed {
         width: 100%;
@@ -71,7 +71,6 @@
         margin-top: 120px;
         margin-left: 0;
         padding: 16px;
-        overflow-x: hidden;
       }
 
       .main-content-fixed.sidebar-collapsed {
@@ -84,29 +83,22 @@
 <body>
 
   <!-- =========================
-       MODAL FUNCTIONS (DEFINE FIRST)
+       GLOBAL MODAL FUNCTIONS
   ========================= -->
   <script>
-    /* =========================
-       MODAL FUNCTIONS (GLOBAL)
-    ========================= */
-    window.openModal = function() {
+    window.openModal = function () {
       const modal = document.getElementById("appointmentModal");
       if (modal) {
         modal.classList.add("active");
         document.body.style.overflow = "hidden";
-        console.log("Modal opened");
-      } else {
-        console.error("Modal not found!");
       }
     };
 
-    window.closeModal = function() {
+    window.closeModal = function () {
       const modal = document.getElementById("appointmentModal");
       if (modal) {
         modal.classList.remove("active");
         document.body.style.overflow = "";
-        console.log("Modal closed");
       }
     };
   </script>
@@ -126,7 +118,7 @@
   ========================= -->
   <main class="main-content-fixed">
 
-    <!-- CALENDAR VIEW (DEFAULT) -->
+    <!-- CALENDAR VIEW -->
     <section id="calendar-view"></section>
 
     <!-- DASHBOARD VIEW -->
@@ -140,12 +132,9 @@
   <div id="modal-root"></div>
 
   <!-- =========================
-       SCRIPTS
+       LOAD HTML PARTIALS
   ========================= -->
   <script>
-    /* =========================
-       LOAD HTML PARTIALS
-    ========================= */
     fetch("header.html")
       .then(r => r.text())
       .then(html => document.getElementById("header-root").innerHTML = html);
@@ -158,8 +147,7 @@
       .then(r => r.text())
       .then(html => {
         document.getElementById("calendar-view").innerHTML = html;
-        // Initialize calendar after loading
-        if (typeof renderCalendar === 'function') {
+        if (typeof renderCalendar === "function") {
           renderCalendar();
         }
       });
@@ -171,10 +159,12 @@
     fetch("modal.html")
       .then(r => r.text())
       .then(html => document.getElementById("modal-root").innerHTML = html);
+  </script>
 
-    /* =========================
-       SIDEBAR TAB SWITCHING & COLLAPSE
-    ========================= */
+  <!-- =========================
+       SIDEBAR TAB SWITCHING
+  ========================= -->
+  <script>
     document.addEventListener("click", function (e) {
       const calendarTab = e.target.closest("#calendarTab");
       const dashboardTab = e.target.closest("#dashboardTab");
@@ -182,51 +172,47 @@
 
       const calendarView = document.getElementById("calendar-view");
       const dashboardView = document.getElementById("dashboard-view");
+      const mainContent = document.querySelector(".main-content-fixed");
+      const sidebarRoot = document.getElementById("sidebar-root");
 
-      // Handle sidebar collapse toggle
       if (collapseBtn) {
-        e.preventDefault();
-        const sidebarRoot = document.getElementById("sidebar-root");
-        const sidebar = sidebarRoot ? sidebarRoot.querySelector(".sidebar") : null;
-        const mainContent = document.querySelector(".main-content-fixed");
-        
-        if (sidebar && mainContent) {
-          sidebar.classList.toggle("collapsed");
-          sidebarRoot.classList.toggle("collapsed");
-          mainContent.classList.toggle("sidebar-collapsed");
-          console.log("Sidebar toggled");
-        } else {
-          console.error("Sidebar or main content not found");
-        }
+        const sidebar = sidebarRoot?.querySelector(".sidebar");
+        sidebar?.classList.toggle("collapsed");
+        sidebarRoot?.classList.toggle("collapsed");
+        mainContent?.classList.toggle("sidebar-collapsed");
         return;
       }
 
       if (calendarTab) {
-        e.preventDefault();
-
         calendarView.style.display = "block";
         dashboardView.style.display = "none";
-
         calendarTab.classList.add("active");
-        document.getElementById("dashboardTab").classList.remove("active");
+        document.getElementById("dashboardTab")?.classList.remove("active");
       }
 
       if (dashboardTab) {
-        e.preventDefault();
-
         dashboardView.style.display = "block";
         calendarView.style.display = "none";
-
         dashboardTab.classList.add("active");
-        document.getElementById("calendarTab").classList.remove("active");
+        document.getElementById("calendarTab")?.classList.remove("active");
       }
     });
   </script>
 
-  <!-- Calendar functionality script -->
+  <!-- =========================
+       SCRIPTS (ORDER MATTERS)
+  ========================= -->
+
+  <!-- GLOBAL STORE -->
+  <script src="store.js"></script>
+
+  <!-- CALENDAR -->
   <script src="calendar.js"></script>
-  
-  <!-- Modal functionality script -->
+
+  <!-- DASHBOARD -->
+  <script src="dashboard.js"></script>
+
+  <!-- MODAL -->
   <script src="modal.js"></script>
 
 </body>
