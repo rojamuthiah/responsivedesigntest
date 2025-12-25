@@ -80,7 +80,7 @@
   }
   
   /* ================================
-     FIELD GROUP (Icon + Dropdown/Input)
+     FIELD GROUP
   ================================ */
   .field-group {
     display: flex;
@@ -100,7 +100,7 @@
   }
   
   /* ================================
-     DROPDOWN & INPUT STYLING
+     INPUT & DROPDOWN
   ================================ */
   .field-input {
     flex: 1;
@@ -119,7 +119,11 @@
     transition: border-color 0.2s;
   }
   
-  /* Dropdown specific styles */
+  .field-input:focus {
+    border-color: #1f6fff;
+  }
+  
+  /* Dropdown arrow */
   select.field-input {
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%232E2E2E' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -128,26 +132,16 @@
     padding-right: 36px;
   }
   
-  .field-input:focus {
-    border-color: #1f6fff;
-  }
-  
-  .field-input option {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 14px;
-    padding: 8px;
-  }
-  
-  /* Placeholder styling for select */
   select.field-input option:first-child {
     color: #9a9a9a;
   }
   
-  /* For date and time inputs */
+  /* ================================
+     DATE & TIME
+  ================================ */
   input[type="date"].field-input,
   input[type="time"].field-input {
     color: #9a9a9a;
-    cursor: pointer;
   }
   
   input[type="date"].field-input:focus,
@@ -157,19 +151,10 @@
     color: #2e2e2e;
   }
   
-  /* Remove default date/time icons for cleaner look */
-  input[type="date"].field-input::-webkit-calendar-picker-indicator,
-  input[type="time"].field-input::-webkit-calendar-picker-indicator {
-    opacity: 0;
-    position: absolute;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-  }
-  
+  /* Hide native icon visually ONLY (no overlay, no blocking) */
+
   /* ================================
-     REASON FIELD (Full Width Textarea)
+     REASON FIELD
   ================================ */
   .reason-field {
     grid-column: span 2;
@@ -198,7 +183,6 @@
     outline: none;
     resize: vertical;
     min-height: 56px;
-    transition: border-color 0.2s;
   }
   
   .reason-input:focus {
@@ -206,15 +190,11 @@
   }
   
   .reason-input::placeholder {
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
     color: #9a9a9a;
   }
   
   /* ================================
-     MODAL FOOTER
+     FOOTER
   ================================ */
   .modal-footer {
     display: flex;
@@ -231,12 +211,7 @@
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s;
-    border: none;
     height: 38px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
   }
   
   .btn-outline {
@@ -271,7 +246,6 @@
   
     .form-grid {
       grid-template-columns: 1fr;
-      gap: 12px;
     }
   
     .reason-field {
@@ -286,3 +260,4 @@
       width: 100%;
     }
   }
+  
